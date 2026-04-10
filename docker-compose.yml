@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Servidor Web y PHP
+  web:
+    image: php:8.2-apache
+    container_name: aj_inventory_web
+    ports:
+      - "8085:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - inventory_network
+
+  # Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: aj_inventory_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: inventory_db
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: dev_user
+      MYSQL_PASSWORD: dev_password
+    ports:
+      - "3306:3306"
+    networks:
+      - inventory_network
+
+  # Administrador de BD (Visual para ti)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: aj_inventory_pma
+    links:
+      - db
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_ARBITRARY: 1
+    networks:
+      - inventory_network
+
+networks:
+  inventory_network:
+    driver: bridge

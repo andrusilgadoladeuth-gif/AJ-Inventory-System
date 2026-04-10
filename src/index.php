@@ -1,0 +1,1 @@
+<?php echo "<h1>AJ-Inventory-System: Entorno Docker funcionando correctamente</h1>"; ?>

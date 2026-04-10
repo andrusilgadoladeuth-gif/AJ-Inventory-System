@@ -1,0 +1,10 @@
+# Docker logs e internos
+.docker/
+docker-compose.override.yml
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar base de datos si se exporta localmente
+*.sql.gz
