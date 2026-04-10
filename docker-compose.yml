@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Servidor Web y PHP
   web:
-    image: php:8.2-apache
+    build: .  # <--- Esto le dice que use el Dockerfile de esta carpeta
     container_name: aj_inventory_web
     ports:
       - "8085:80"
