@@ -25,7 +25,7 @@
         <li class="nav-item"><a class="nav-link" href="index.php">Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" href="products.php">Productos</a></li>
         <li class="nav-item"><a class="nav-link" href="categories.php">Categorías</a></li>
-        <li class="nav-item"><a class="nav-link text-warning" href="sales.php fw-bold">Nueva Venta</a></li>
+        <li class="nav-item"><a class="nav-link text-warning" href="sales.php">Nueva Venta</a></li>
       </ul>
     </div>
   </div>
