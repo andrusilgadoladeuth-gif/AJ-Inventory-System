@@ -1,4 +1,6 @@
 <?php 
+// IMPORTANTE: Asegúrate de que este session_start() esté siempre antes de cualquier HTML
+session_start(); 
 require_once 'db.php'; 
 
 // --- 1. LÓGICA PARA ELIMINAR ---
@@ -6,11 +8,9 @@ if (isset($_GET['delete'])) {
     $id_a_eliminar = $_GET['delete'];
     
     try {
-        // Intentamos eliminar
         $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
         $stmt->execute([$id_a_eliminar]);
         
-        // Si no hubo error, reiniciamos el AUTO_INCREMENT al ID más alto que quede
         $result = $pdo->query("SELECT MAX(id) FROM categories")->fetchColumn();
         $next_id = $result ? $result + 1 : 1;
         $pdo->exec("ALTER TABLE categories AUTO_INCREMENT = $next_id");
@@ -18,8 +18,9 @@ if (isset($_GET['delete'])) {
         header("Location: categories.php");
         exit();
     } catch (PDOException $e) {
-        // Si tiene productos asociados, redirigimos con un error
-        header("Location: categories.php?error=1");
+        // Guardamos el error en la sesión para que se muestre una sola vez
+        $_SESSION['error_message'] = "No se puede eliminar, tiene productos asociados.";
+        header("Location: categories.php");
         exit();
     }
 }
@@ -28,7 +29,6 @@ if (isset($_GET['delete'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_name'])) {
     $stmt = $pdo->prepare("INSERT INTO categories (name) VALUES (?)");
     $stmt->execute([$_POST['category_name']]);
-    
     header("Location: categories.php?success=1"); 
     exit(); 
 }
@@ -49,11 +49,12 @@ include 'header.php';
             </div>
         <?php endif; ?>
 
-        <?php if (isset($_GET['error'])): ?>
+        <?php if (isset($_SESSION['error_message'])): ?>
             <div class='alert alert-danger alert-dismissible fade show'>
-                <strong>Error:</strong> No se puede eliminar, tiene productos asociados.
+                <strong>Error:</strong> <?php echo $_SESSION['error_message']; ?>
                 <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
             </div>
+            <?php unset($_SESSION['error_message']); // Borramos el error tras mostrarlo ?>
         <?php endif; ?>
 
         <div class="card shadow-sm border-0">
