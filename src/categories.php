@@ -75,7 +75,7 @@ include 'header.php';
                     </thead>
                     <tbody>
                         <?php foreach ($categories as $cat): 
-                            // Conversión a hora local de Colombia
+                            // Conversión a hora local de Colombia, se ajusta a cualquier zona horaria
                             $date = new DateTime($cat['created_at'], new DateTimeZone('UTC'));
                             $date->setTimezone(new DateTimeZone('America/Bogota'));
                         ?>
