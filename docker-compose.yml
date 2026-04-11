@@ -15,6 +15,7 @@ services:
       - inventory_network
 
   # Base de Datos MySQL
+  # Base de Datos MySQL
   db:
     image: mysql:8.0
     container_name: aj_inventory_db
@@ -26,6 +27,9 @@ services:
       MYSQL_PASSWORD: dev_password
     ports:
       - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql        
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
     networks:
       - inventory_network
 

@@ -1,36 +1,45 @@
 <?php 
 require_once 'db.php'; 
 
-// --- LÓGICA PARA ELIMINAR (Mover aquí arriba para evitar el error) ---
+// --- 1. LÓGICA PARA ELIMINAR Y REINICIAR CONTADOR ---
 if (isset($_GET['delete'])) {
     $id_a_eliminar = $_GET['delete'];
+    
+    // Eliminamos la categoría
     $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
     $stmt->execute([$id_a_eliminar]);
     
-    // Ahora el header funcionará perfecto porque no se ha enviado HTML aún
+    // Esta es la "magia" para que el ID no salte números:
+    // 1. Buscamos el ID máximo actual
+    $result = $pdo->query("SELECT MAX(id) FROM categories")->fetchColumn();
+    $next_id = $result ? $result + 1 : 1;
+    
+    // 2. Reiniciamos el contador AUTO_INCREMENT al siguiente número lógico
+    $pdo->exec("ALTER TABLE categories AUTO_INCREMENT = $next_id");
+    
     header("Location: categories.php"); 
     exit(); 
 }
 
-// --- LÓGICA PARA GUARDAR ---
+// --- 2. LÓGICA PARA GUARDAR ---
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_name'])) {
-    $name = $_POST['category_name'];
     $stmt = $pdo->prepare("INSERT INTO categories (name) VALUES (?)");
-    $stmt->execute([$name]);
-    // Nota: Aquí no usamos header, así que el mensaje de éxito se mostrará abajo
-    $mensaje_exito = true;
+    $stmt->execute([$_POST['category_name']]);
+    
+    header("Location: categories.php?success=1"); 
+    exit(); 
 }
 
-// Obtener todas las categorías
-$stmt = $pdo->query("SELECT * FROM categories ORDER BY id DESC");
+// --- 3. CONSULTA DE DATOS (Orden ascendente) ---
+$stmt = $pdo->query("SELECT * FROM categories ORDER BY id ASC");
 $categories = $stmt->fetchAll();
 
-include 'header.php'; // El HTML empieza AQUÍ
+include 'header.php'; 
 ?>
 
 <div class="row">
     <div class="col-md-4">
-        <?php if (isset($mensaje_exito)): ?>
+        <?php if (isset($_GET['success'])): ?>
             <div class='alert alert-success alert-dismissible fade show'>
                 Categoría guardada con éxito.
                 <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
@@ -60,20 +69,24 @@ include 'header.php'; // El HTML empieza AQUÍ
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Fecha</th>
+                            <th>Fecha (Colombia)</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($categories as $cat): ?>
+                        <?php foreach ($categories as $cat): 
+                            // Conversión a hora local de Colombia
+                            $date = new DateTime($cat['created_at'], new DateTimeZone('UTC'));
+                            $date->setTimezone(new DateTimeZone('America/Bogota'));
+                        ?>
                         <tr>
                             <td><?php echo $cat['id']; ?></td>
                             <td><span class="badge bg-light text-dark border"><?php echo $cat['name']; ?></span></td>
-                            <td class="small text-muted"><?php echo $cat['created_at']; ?></td>
+                            <td class="small text-muted"><?php echo $date->format('Y-m-d H:i'); ?></td>
                             <td class="text-center">
                                 <a href="categories.php?delete=<?php echo $cat['id']; ?>" 
                                    class="btn btn-sm btn-outline-danger" 
-                                   onclick="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                                   onclick="return confirm('¿Seguro que deseas eliminar? Recuerda borrar los productos asociados primero.')">
                                    Eliminar
                                 </a>
                             </td>

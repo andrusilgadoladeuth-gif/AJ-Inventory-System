@@ -8,3 +8,4 @@ Thumbs.db
 
 # Ignorar base de datos si se exporta localmente
 *.sql.gz
+mysql_data/
