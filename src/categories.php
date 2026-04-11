@@ -1,24 +1,27 @@
 <?php 
 require_once 'db.php'; 
 
-// --- 1. LÓGICA PARA ELIMINAR Y REINICIAR CONTADOR ---
+// --- 1. LÓGICA PARA ELIMINAR ---
 if (isset($_GET['delete'])) {
     $id_a_eliminar = $_GET['delete'];
     
-    // Eliminamos la categoría
-    $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
-    $stmt->execute([$id_a_eliminar]);
-    
-    // Esta es la "magia" para que el ID no salte números:
-    // 1. Buscamos el ID máximo actual
-    $result = $pdo->query("SELECT MAX(id) FROM categories")->fetchColumn();
-    $next_id = $result ? $result + 1 : 1;
-    
-    // 2. Reiniciamos el contador AUTO_INCREMENT al siguiente número lógico
-    $pdo->exec("ALTER TABLE categories AUTO_INCREMENT = $next_id");
-    
-    header("Location: categories.php"); 
-    exit(); 
+    try {
+        // Intentamos eliminar
+        $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
+        $stmt->execute([$id_a_eliminar]);
+        
+        // Si no hubo error, reiniciamos el AUTO_INCREMENT al ID más alto que quede
+        $result = $pdo->query("SELECT MAX(id) FROM categories")->fetchColumn();
+        $next_id = $result ? $result + 1 : 1;
+        $pdo->exec("ALTER TABLE categories AUTO_INCREMENT = $next_id");
+        
+        header("Location: categories.php");
+        exit();
+    } catch (PDOException $e) {
+        // Si tiene productos asociados, redirigimos con un error
+        header("Location: categories.php?error=1");
+        exit();
+    }
 }
 
 // --- 2. LÓGICA PARA GUARDAR ---
@@ -30,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_name'])) {
     exit(); 
 }
 
-// --- 3. CONSULTA DE DATOS (Orden ascendente) ---
+// --- 3. CONSULTA DE DATOS ---
 $stmt = $pdo->query("SELECT * FROM categories ORDER BY id ASC");
 $categories = $stmt->fetchAll();
 
@@ -42,6 +45,13 @@ include 'header.php';
         <?php if (isset($_GET['success'])): ?>
             <div class='alert alert-success alert-dismissible fade show'>
                 Categoría guardada con éxito.
+                <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <div class='alert alert-danger alert-dismissible fade show'>
+                <strong>Error:</strong> No se puede eliminar, tiene productos asociados.
                 <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
             </div>
         <?php endif; ?>
@@ -75,7 +85,6 @@ include 'header.php';
                     </thead>
                     <tbody>
                         <?php foreach ($categories as $cat): 
-                            // Conversión a hora local de Colombia, se ajusta a cualquier zona horaria
                             $date = new DateTime($cat['created_at'], new DateTimeZone('UTC'));
                             $date->setTimezone(new DateTimeZone('America/Bogota'));
                         ?>
@@ -86,9 +95,7 @@ include 'header.php';
                             <td class="text-center">
                                 <a href="categories.php?delete=<?php echo $cat['id']; ?>" 
                                    class="btn btn-sm btn-outline-danger" 
-                                   onclick="return confirm('¿Seguro que deseas eliminar? Recuerda borrar los productos asociados primero.')">
-                                   Eliminar
-                                </a>
+                                   onclick="return confirm('¿Seguro que deseas eliminar esta categoría?')">Eliminar</a>
                             </td>
                         </tr>
                         <?php endforeach; ?>
