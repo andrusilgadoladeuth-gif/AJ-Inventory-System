@@ -23,7 +23,7 @@ Este es un sistema web ágil desarrollado en PHP para la gestión de inventario,
 
 **Base de Datos Relacional:** Estructura sólida con integridad referencial (Clientes, Ventas, Productos).
 
-🏗️ Estructura de la Base de Datos
+🏗️  **Estructura de la Base de Datos**
 El sistema utiliza 5 tablas principales interconectadas:
 
 1. Categories: Clasificación de productos.
