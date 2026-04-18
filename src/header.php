@@ -26,6 +26,9 @@
         <li class="nav-item"><a class="nav-link" href="products.php">Productos</a></li>
         <li class="nav-item"><a class="nav-link" href="categories.php">Categorías</a></li>
         <li class="nav-item"><a class="nav-link text-warning" href="sales.php">Nueva Venta</a></li>
+        <li class="nav-item"><a class="nav-link" href="reports.php">Reportes</a>
+        <li class="nav-item"><a class="nav-link" href="customers.php">Clientes</a>
+</li>
       </ul>
     </div>
   </div>
