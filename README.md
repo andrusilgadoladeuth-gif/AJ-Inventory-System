@@ -6,7 +6,7 @@ Sistema profesional de gestión de inventario y facturación.
 * **Backend:** PHP 8.2
 * **Database:** MySQL 8.0
 * **Infrastructure:** Docker & Docker Compose
-* **Frontend:** Bootstrap 5 (Próximamente)
+* **Frontend:** Bootstrap 5 (Responsive)
 
 
    ## AJ INVENTORY - Sistema de Gestión de Inventario y Ventas
