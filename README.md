@@ -51,7 +51,9 @@ Ingresa a phpMyAdmin desde tu navegador: http://localhost:8081
 Crea una base de datos llamada inventory_db (o el nombre que tengas en db.php).
 
 **Servidor:** db
+
 **Usuario:** root
+
 **Contraseña:** root_password
 
 Importa el archivo SQL que se encuentra en la carpeta sql/ o copia el código del esquema directamente en la pestaña SQL.
