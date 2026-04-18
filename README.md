@@ -49,6 +49,7 @@ Configurar la Base de Datos:
 Ingresa a phpMyAdmin desde tu navegador: http://localhost:8081
 
 Crea una base de datos llamada inventory_db (o el nombre que tengas en db.php).
+
 **Servidor:** db
 **Usuario:** root
 **Contraseña:** root_password
